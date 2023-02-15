@@ -2,14 +2,15 @@ FROM certbot/certbot
 
 WORKDIR /
 
-RUN wget https://releases.rancher.com/cli2/v2.4.9/rancher-linux-amd64-v2.4.9.tar.gz && \
-  tar zxvf rancher-linux-amd64-v2.4.9.tar.gz && \
-  install -o root -g root -m 0755 /rancher-v2.4.9/rancher /usr/local/bin/rancher
+# Download and install Rancher CLI
+RUN wget https://github.com/rancher/cli/releases/download/v2.7.0/rancher-linux-amd64-v2.7.0.tar.xz && tar xvf rancher-linux-amd64-v2.7.0.tar.xz && install -o root -g root -m 0755 /rancher-v2.7.0/rancher /usr/local/bin/rancher
 
-RUN wget "https://dl.k8s.io/release/v1.18.15/bin/linux/amd64/kubectl" && \
-  install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+# Download kubectl binary
+RUN wget "https://dl.k8s.io/release/$(wget -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+# Validate and install kubectl binary. Should fail if SHA256 check doesn't work.
+RUN wget "https://dl.k8s.io/$(wget -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && echo "$(cat kubectl.sha256)  kubectl" | sha256sum -c && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 COPY scripts /scripts
 
 WORKDIR /opt/certbot
-
