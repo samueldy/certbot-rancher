@@ -3,6 +3,11 @@ if [[ -z "${DOMAIN}" ]]; then
     exit 1
 fi
 
+if [[ -z "${LIVE_DOMAIN_FOLDER_NAME}" ]]; then
+    echo "LIVE_DOMAIN_FOLDER_NAME enviroment variable must be defined." 1>&2
+    exit 1
+fi
+
 if [[ -z "${CONTEXT}" ]]; then
     echo "CONTEXT enviroment variable must be defined." 1>&2
     exit 1
@@ -28,8 +33,8 @@ if [ ! -f /secrets/bearer-token ]; then
     exit 1
 fi
 
-CERT_PATH=/etc/letsencrypt/live/$DOMAIN/fullchain.pem
-KEY_PATH=/etc/letsencrypt/live/$DOMAIN/privkey.pem
+CERT_PATH=/etc/letsencrypt/live/$LIVE_DOMAIN_FOLDER_NAME/fullchain.pem
+KEY_PATH=/etc/letsencrypt/live/$LIVE_DOMAIN_FOLDER_NAME/privkey.pem
 
 rancher login --token `cat /secrets/bearer-token` $ENDPOINT_URL --context $CONTEXT
 

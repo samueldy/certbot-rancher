@@ -48,7 +48,8 @@ certbot will write the certificates.
 
 The following environment variables must be configured on these workloads:
 
-- `DOMAIN` - The domain that the SSL cert is to be generated for.
+- `DOMAIN` - The domain that the SSL cert is to be generated for. Can be a single domain, or a comma-separated list of domains.
+- `LIVE_DOMAIN_FOLDER_NAME` - The name of the folder in /etc/letsencrypt/live that contains the certs obtained from the CA. Normally this is the same as $DOMAIN if you are requesting certs for a single domain. If there are multiple domains specified in $DOMAIN, this variable is the name of the first domain in that list.
 - `CERT_NAME` - The name to give the SSL cert in Rancher.
 - `NAMESPACE` - The Rancher namespace to create the certificate in.
 - `ENDPOINT_URL` - The to use to login to Rancher (for example: https://rancher2.spin.nersc.gov/v3).
