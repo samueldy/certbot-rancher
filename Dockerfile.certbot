@@ -12,5 +12,9 @@ RUN wget "https://dl.k8s.io/release/$(wget -O - https://dl.k8s.io/release/stable
 RUN wget "https://dl.k8s.io/$(wget -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && echo "$(cat kubectl.sha256)  kubectl" | sha256sum -c && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 COPY scripts /scripts
+RUN chmod -R u+x /scripts/*
 
 WORKDIR /opt/certbot
+
+# By default, start the cron daemon.
+ENTRYPOINT /scripts/start-crond.sh
