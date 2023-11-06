@@ -1,0 +1,6 @@
+# Anacrontab to renew certificates every so often
+
+# Format of each line:
+# PERIOD(DAYS) DELAY IDENTIFIER COMMAND
+# See https://linux.die.net/man/5/anacrontab
+60 0 certbot-renew-certs /scripts/renew.sh

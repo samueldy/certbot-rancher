@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-# Specify forced renewal so that we can let the cron job take care of
-# auto-renewing before the certificate is expired. Like every 60 days.
-certbot renew --force-renewal --deploy-hook /scripts/update_rancher.sh
+# Log the cert renewal attempt.
+echo "Attempted to renew TLS certs as of $(date -Is)." 2>&1 >>"$LOGSDIR/renew-log"
+
+# Do the renewal. Certbot should run the hook scripts automatically.
+certbot renew 2>&1 >>"$LOGSDIR/renew-log"

@@ -1,3 +1,8 @@
+#!/bin/bash
+
+# Import environment variables.
+source /etc/environment
+
 if [[ -z "${DOMAIN}" ]]; then
     echo "DOMAIN enviroment variable must be defined." 1>&2
     exit 1
@@ -36,7 +41,7 @@ fi
 CERT_PATH=/etc/letsencrypt/live/$LIVE_DOMAIN_FOLDER_NAME/fullchain.pem
 KEY_PATH=/etc/letsencrypt/live/$LIVE_DOMAIN_FOLDER_NAME/privkey.pem
 
-rancher login --token `cat /secrets/bearer-token` $ENDPOINT_URL --context $CONTEXT
+rancher login --token $(cat /secrets/bearer-token) $ENDPOINT_URL --context $CONTEXT
 
 rancher kubectl -n $NAMESPACE create secret tls $CERT_NAME --cert=$CERT_PATH \
-  --key=$KEY_PATH --dry-run=client --save-config -o yaml | rancher kubectl apply -f -
+    --key=$KEY_PATH --dry-run=client --save-config -o yaml | rancher kubectl apply -f -
