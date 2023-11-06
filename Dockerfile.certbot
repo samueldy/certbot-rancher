@@ -1,18 +1,32 @@
-FROM certbot/certbot
+FROM certbot/certbot:latest
 
 WORKDIR /
 
 # Download and install Rancher CLI
-RUN wget https://github.com/rancher/cli/releases/download/v2.7.0/rancher-linux-amd64-v2.7.0.tar.xz && tar xvf rancher-linux-amd64-v2.7.0.tar.xz && install -o root -g root -m 0755 /rancher-v2.7.0/rancher /usr/local/bin/rancher
+RUN wget https://github.com/rancher/cli/releases/download/v2.7.0/rancher-linux-amd64-v2.7.0.tar.xz && \
+    tar xvf rancher-linux-amd64-v2.7.0.tar.xz && \
+    install -o root -g root -m 0755 /rancher-v2.7.0/rancher /usr/local/bin/rancher && \
+    rm /rancher-linux-amd64-v2.7.0.tar.xz
 
 # Download kubectl binary
 RUN wget "https://dl.k8s.io/release/$(wget -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
 # Validate and install kubectl binary. Should fail if SHA256 check doesn't work.
-RUN wget "https://dl.k8s.io/$(wget -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && echo "$(cat kubectl.sha256)  kubectl" | sha256sum -c && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+RUN wget "https://dl.k8s.io/$(wget -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
+    echo "$(cat kubectl.sha256)  kubectl" | sha256sum -c && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+    rm /kubectl && rm /kubectl.sha256
 
 COPY scripts /scripts
 RUN chmod -R u+x /scripts/*
+
+# Also need to set up anacron
+RUN apk update && \
+    apk upgrade && \
+    apk add cronie
+
+COPY ./cron-configs/anacrontab /etc/anacrontab
+COPY ./cron-configs/crontab /etc/crontabs/root
 
 WORKDIR /opt/certbot
 
