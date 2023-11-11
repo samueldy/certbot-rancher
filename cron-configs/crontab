@@ -12,4 +12,4 @@
 
 # Run anacron each day, and let anacron decide if it's been long enough to
 # refire the cert renewal.
-15 15 * * ? /usr/sbin/anacron -t /etc/anacrontab -S /var/spool/anacron-store/anacron
+15 15 * * * /usr/sbin/anacron -t /etc/anacrontab -S /var/spool/anacron-store/anacron

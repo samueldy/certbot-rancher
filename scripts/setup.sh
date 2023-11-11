@@ -11,10 +11,10 @@ if [[ -z "${EMAIL}" ]]; then
 fi
 
 certbot certonly --webroot \
-  -m $EMAIL \
-  --agree-tos \
-  --no-eff-email \
-  --webroot-path=/data/letsencrypt \
-  -d $DOMAIN \
-  -n \
-  --post-hook /scripts/update_rancher.sh
+    -m $EMAIL \
+    --agree-tos \
+    --no-eff-email \
+    --webroot-path=/data/letsencrypt \
+    -d $DOMAIN \
+    -n \
+    --post-hook /scripts/update_rancher.sh
