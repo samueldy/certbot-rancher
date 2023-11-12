@@ -11,8 +11,15 @@ LOGSDIR=/var/spool/anacron-store/logs
 /scripts/open_pgadmin_access.sh
 sleep 10
 
-# Do the renewal
-certbot renew --force-renewal --deploy-hook /scripts/update_rancher.sh && echo "TLS certs renewed as of $(date -Is)." 2>&1 | tee -a $LOGSDIR/anacrontab-output.log
+# Do the renewal.
+certbot renew --force-renewal 2>&1 | tee -a $LOGSDIR/anacrontab-output.log
+
+# Update Rancher separately, because using this script as a deploy hook somehow
+# drops the $DOMAIN variable.
+/scripts/update_rancher.sh 2>&1 | tee -a $LOGSDIR/anacrontab-output.log
+
+# Log attempt.
+echo "Attempted to renew TLS certs as of $(date -Is)." 2>&1 | tee -a $LOGSDIR/anacrontab-output.log
 sleep 10
 
 # Finally, re-protect PgAdmin4 ingress.
