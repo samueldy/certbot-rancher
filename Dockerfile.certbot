@@ -23,7 +23,7 @@ RUN chmod -R u+x /scripts/*
 # Also need to set up anacron
 RUN apk update && \
     apk upgrade && \
-    apk add cronie
+    apk add cronie bash
 
 COPY ./cron-configs/anacrontab /etc/anacrontab
 COPY ./cron-configs/crontab /etc/crontabs/root

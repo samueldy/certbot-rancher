@@ -1,3 +1,8 @@
+#!/bin/bash
+
+# Import environment variables.
+source /etc/environment
+
 if [[ -z "${DOMAIN}" ]]; then
     echo "DOMAIN enviroment variable must be defined." 1>&2
     exit 1

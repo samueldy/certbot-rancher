@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-# Preserve env. variables for cron jobs
+# Preserve environment variables for cron jobs
 printenv > /etc/environment
 
 # Need to wait for cron volume mount to become available

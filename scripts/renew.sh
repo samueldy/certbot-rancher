@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 LOGSDIR=/var/spool/anacron-store/logs
 
 # Specify forced renewal so that we can let the cron job take care of

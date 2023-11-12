@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 # Script to unblock the PgAdmin4 ingress so that the Let's Encrypt CA can access it for renewal purposes.
+
+# Import environment variables.
+source /etc/environment
 
 if [[ -z "${CONTEXT}" ]]; then
     echo "CONTEXT enviroment variable must be defined." 1>&2
