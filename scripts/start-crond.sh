@@ -13,11 +13,14 @@ sed -i -e '/hook/d' /etc/letsencrypt/renewal/alloy-synthesis.che.engin.umich.edu
 mkdir -p "$LOGSDIR"
 
 # Install certbot hooks
-mkdir -p /etc/letsencrypt/renewal-hooks/{pre,post,deploy} &&
-ln -s /scripts/open_pgadmin_access.sh /etc/letsencrypt/renewal-hooks/pre/open_pgadmin_access.sh &&
-ln -s /scripts/close_pgadmin_access.sh /etc/letsencrypt/renewal-hooks/post/close_pgadmin_access.sh &&
+mkdir -p /etc/letsencrypt/renewal-hooks/{pre,post,deploy}
+rm /etc/letsencrypt/renewal-hooks/pre/open_pgadmin_access.sh
+rm /etc/letsencrypt/renewal-hooks/post/close_pgadmin_access.sh
+rm /etc/letsencrypt/renewal-hooks/deploy/update_rancher.sh
+ln -s /scripts/open_pgadmin_access.sh /etc/letsencrypt/renewal-hooks/pre/open_pgadmin_access.sh
+ln -s /scripts/close_pgadmin_access.sh /etc/letsencrypt/renewal-hooks/post/close_pgadmin_access.sh
 ln -s /scripts/update_rancher.sh /etc/letsencrypt/renewal-hooks/deploy/update_rancher.sh
 
 # Entrypoint to run cron daemon instead of the certbot CLI. Run in foreground
 # so container doesn't error out.
-/usr/sbin/crond -n >/dev/stdout 2>/dev/stderr
+/usr/sbin/crond -f -l 2 -L /dev/stdout 2>/dev/stderr
