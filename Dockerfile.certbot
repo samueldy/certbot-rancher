@@ -20,12 +20,11 @@ RUN wget "https://dl.k8s.io/$(wget -O - https://dl.k8s.io/release/stable.txt)/bi
 COPY scripts /scripts
 RUN chmod -R u+x /scripts/*
 
-# Also need to set up anacron
+# Have bash available to run scripts.
 RUN apk update && \
     apk upgrade && \
-    apk add cronie bash
+    apk add bash
 
-COPY ./cron-configs/anacrontab /etc/anacrontab
 COPY ./cron-configs/crontab /etc/crontabs/root
 
 WORKDIR /opt/certbot

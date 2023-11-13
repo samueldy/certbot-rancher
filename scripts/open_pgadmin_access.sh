@@ -34,3 +34,8 @@ rancher kubectl -n $NAMESPACE get ingress "pgadmin4-main" -o jsonpath='{.metadat
 # Now delete that annotation so that all IPs (including those of Let's Encrypt
 # CA) can access the site.
 rancher kubectl -n $NAMESPACE annotate ingress "pgadmin4-main" "nginx.ingress.kubernetes.io/whitelist-source-range"-
+
+# Wait a little after opening ingress to avoid race condition where certbot
+# tries to read the well-known ACME challenge before that ingress endpoint is
+# actually unblocked.
+sleep 10

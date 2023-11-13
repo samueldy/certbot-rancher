@@ -1,18 +1,22 @@
 #!/bin/bash
 
 # Preserve environment variables for cron jobs
-printenv > /etc/environment
+printenv >/etc/environment
 
 # Need to wait for cron volume mount to become available
 sleep 10
 
-# Make necessary anacron timestamp and log directories if they don't already
-# exist.
-mkdir -p /var/spool/anacron-store/anacron
-mkdir -p /var/spool/anacron-store/logs
-
 # Delete any references to hooks in the certbot renewal config.
 sed -i -e '/hook/d' /etc/letsencrypt/renewal/alloy-synthesis.che.engin.umich.edu.conf
+
+# Ensure that the logs folder is created
+mkdir -p "$LOGSDIR"
+
+# Install certbot hooks
+mkdir -p /etc/letsencrypt/renewal-hooks/{pre,post,deploy} &&
+ln -s /scripts/open_pgadmin_access.sh /etc/letsencrypt/renewal-hooks/pre/open_pgadmin_access.sh &&
+ln -s /scripts/close_pgadmin_access.sh /etc/letsencrypt/renewal-hooks/post/close_pgadmin_access.sh &&
+ln -s /scripts/update_rancher.sh /etc/letsencrypt/renewal-hooks/deploy/update_rancher.sh
 
 # Entrypoint to run cron daemon instead of the certbot CLI. Run in foreground
 # so container doesn't error out.

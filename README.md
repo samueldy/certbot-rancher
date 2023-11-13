@@ -36,17 +36,7 @@ The appropriate ingress should be setup to allow 80 to be routed to this workloa
 The `Dockerfile.certbot` container is used to do both (1) and initial setup of
 your website with Let's Encrypt (accomplished by a one-time run of the script
 `/scripts/setup.sh`) and (2) the periodic renewal of your site's certificate
-(with each renewal accomplished by running the script `/scripts/renew.sh`). The
-Kubernetes/Rancher2 instance at NERSC (`*.svc.spin.nersc.org`) seems not to
-support Kubernetes CronJobs, so the periodica renewal is implemented using a
-combination of [Cron](https://en.wikipedia.org/wiki/Cron) and [Anacron](https://github.com/cronie-crond/cronie/blob/master/README.anacron) (provided through the `cronie` Alpine
-package) to account for the possibility that NERSC's Spin service could go down
-on the scheduled day of cert renewal. By default, the certificate is renewed
-every 60 days [as
-recommended](https://letsencrypt.org/docs/faq/#:~:text=Our%20certificates%20are%20valid%20for,your%20certificates%20every%2060%20days.)
-by Let's Encrypt.
-
-To ensure that the certs are renewed on time, you should mount persistent storage to `/var/spool/anacron-store` inside the image. This storage will contain two subfolders, `anacron` and `logs`, which respectively hold the timestamps of the last run of each Anacron job and the logs for the cert renewal Anacron task. The Anacron config (`cron-configs/anacrontab` in this repo) is installed to `/etc/anacrontab` in the image and contains one task: renewal of the Let's Encrypt certs every 60 days. The Cron config (`cron-configs/crontab` in this repo) is installed to `/etc/crontabs/root` in the iamge and contains one task: the daily running of `anacron`.
+(with each renewal accomplished by running the script `/scripts/renew.sh`). Because the `certbot` utility by default renews certs only when needed (with a default renewal every 60 days [following recommendations](https://letsencrypt.org/docs/faq/#:~:text=Our%20certificates%20are%20valid%20for,your%20certificates%20every%2060%20days)), there's no need for something like `anacron`—we can just have `cron` run `certbot renew` every day, and `certbot` will ensure that the certs are renewed only when needed.
 
 This certbot workload needs to be created from the
 `openchemistry/certbot-rancher` and is be used to execute the certbot commands
@@ -66,6 +56,7 @@ The following environment variables must be configured on these workloads:
 - `ENDPOINT_URL` - The to use to login to Rancher (for example: https://rancher2.spin.nersc.gov/v3).
 - `CONTEXT` - The rancher project id.
 - `EMAIL` - The email for certbot to use for notifications.
+- `LOGSDIR` - the location where you want logs from the `renew.sh` script described below to be stored. These can be put inside the image's temporary filesystem (e.g., somewhere under `/var/log`) or somewhere in persistent storage if you want to retain them.
 
 The following secret should be mounted into the workload:
 - `/secrets/bearer-token` - This should contain the bearer token to be used for `rancher login`.
@@ -73,10 +64,13 @@ The following secret should be mounted into the workload:
 
 ### Script
 
-The image provides two script that can be used as entrypoints:
+The image provides some scripts that can be used as entrypoints:
 
 - `/scripts/setup.sh` - Run to create the initial certificate.
 - `/scripts/renew.sh` - Run periodically to renew the certificate it necessary.
+- `/scripts/open_pgadmin_access.sh` and `/scripts/close_pgadmin_access.sh` - Unblock and reblock the Kubernetes Nginx-class ingress exposing our PgAdmin4 service. Normally the ingress should remain IP-blocked to all but a few IP addresses, but it's necessary to temporarily open the ingress in order to renew its certificate.
+- `/scripts/update_rancher.sh` - post-renewal deploy hook script for certbot to push the newly obtained certificates to NERSC's Kubernetes instance using the Rancher CLI.
+- `/scripts/start-crond.sh` - Entrypoint script to start the `cron` daemon instead of running `certbot`.
 
 
 Once the initial setup workload job has been execute a Rancher certificate will have

@@ -10,6 +10,5 @@
 # *  *  *  *  *  command to be executed
 # *  *  *  *  *  command --arg1 --arg2 file1 file2 2>&1
 
-# Run anacron each day, and let anacron decide if it's been long enough to
-# refire the cert renewal.
-15 15 * * * /usr/sbin/anacron -t /etc/anacrontab -S /var/spool/anacron-store/anacron
+# Have certbot check twice a day whether it's time to do cert renewal.
+15 03,15 * * * /bin/bash /scripts/renew.sh
