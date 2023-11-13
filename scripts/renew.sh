@@ -20,7 +20,6 @@ certbot renew --force-renewal 2>&1 | tee -a $LOGSDIR/anacrontab-output.log
 
 # Log attempt.
 echo "Attempted to renew TLS certs as of $(date -Is)." 2>&1 | tee -a $LOGSDIR/anacrontab-output.log
-sleep 10
 
 # Finally, re-protect PgAdmin4 ingress.
 /scripts/close_pgadmin_access.sh
